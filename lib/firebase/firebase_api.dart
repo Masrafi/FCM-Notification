@@ -6,12 +6,12 @@ import 'package:fcm/pages/notification_screen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-Future<void> handleBackgroundMessage(RemoteMessage message) async {
-  print("......................................");
-  print("Title: ${message.notification?.title}"); 
-  print("Body: ${message.notification?.body}");
-  print("Payload: ${message.data}");
-}
+// Future<void> handleBackgroundMessage(RemoteMessage message) async {
+//   print("......................................");
+//   print("Title: ${message.notification?.title}"); 
+//   print("Body: ${message.notification?.body}");
+//   print("Payload: ${message.data}");
+// }
 
 class FirebaseApi {
   final _firebaseMessaging = FirebaseMessaging.instance;
@@ -26,27 +26,50 @@ class FirebaseApi {
   final _localNotifications = FlutterLocalNotificationsPlugin();
   
   // for route
-  void handleMessage(RemoteMessage? message) {
-    if(message == null) return;
-    
-    navigatorKey.currentState?.pushNamed(
-    NotificationScreen.route,
-    arguments: message
-    );
-  }
+  // void handleMessage(RemoteMessage? message) {
+  //   if(message == null) return;
+  //   print("......................................");
+  //   navigatorKey.currentState?.pushNamed(
+  //   NotificationScreen.route,
+  //   arguments: message
+  //   );
+  // }
+  static Future<void> onDidReceiveNotification(NotificationResponse notificationResponse) async {
+    print("......................................");
+      print("Notification receive");
+       navigatorKey.currentState?.pushNamed(
+          NotificationScreen.route,
+          arguments: notificationResponse
+          );
+    }
   //notification
   Future initLocalNotifications() async {
-    const iOS  = IOSInitializationSettings();
-    const android = AndroidInitializationSettings('@drawable/ic_launcher');
-    const settings = InitializationSettings(android: android, iOS: iOS);
+    const DarwinInitializationSettings ios = DarwinInitializationSettings();
     
+    const android = AndroidInitializationSettings('@drawable/ic_launcher');
+    //const settings = InitializationSettings(android: android, iOS: iOS);
+    const InitializationSettings initializationSettings = InitializationSettings(
+          android: android,
+          iOS: ios,
+        );
+    
+    // await _localNotifications.initialize(
+    // settings,
+    // onSelectNotification: (payload) {
+    //   final message = RemoteMessage.fromMap(jsonDecode(payload!));
+    //   handleMessage(message);
+    // }
+    // );
     await _localNotifications.initialize(
-    settings,
-    onSelectNotification: (payload) {
-      final message = RemoteMessage.fromMap(jsonDecode(payload!));
-      handleMessage(message);
-    }
-    );
+          initializationSettings,
+          onDidReceiveNotificationResponse: onDidReceiveNotification,
+          onDidReceiveBackgroundNotificationResponse: onDidReceiveNotification,
+        );
+    
+        // await _localNotifications
+        //     .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        //     ?.requestNotificationsPermission();
+        
     final playform = _localNotifications.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
     await playform?.createNotificationChannel(_androidChannel);
   }
@@ -56,9 +79,9 @@ class FirebaseApi {
     badge: true,
     sound: true,
     );
-    FirebaseMessaging.instance.getInitialMessage().then(handleMessage);
-    FirebaseMessaging.onMessageOpenedApp.listen(handleMessage);
-    FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
+    // FirebaseMessaging.instance.getInitialMessage().then(handleMessage);
+    // FirebaseMessaging.onMessageOpenedApp.listen(handleMessage);
+    //FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
     //notification
     FirebaseMessaging.onMessage.listen((message) {
       final notification = message.notification;
@@ -75,6 +98,7 @@ class FirebaseApi {
       channelDescription: _androidChannel.description,
       icon: '@drawable/ic_launcher',
       ),
+      iOS: const DarwinNotificationDetails()
       ),
       payload: jsonEncode(message.toMap()),
       );
