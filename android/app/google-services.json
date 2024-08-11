@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "472044434444",
+    "project_id": "fcm-messaging-15457",
+    "storage_bucket": "fcm-messaging-15457.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:472044434444:android:9389b8a07f3f153bc16a29",
+        "android_client_info": {
+          "package_name": "com.firebase_messaging.fcm"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGPvkkCqU8TdxFIDi-Oke1o4xeH2YtplA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
